@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Movimiento Vertical</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="importmap">
+        {
+            "imports": {
+                "./simulation_renderer.js": "./simulation_renderer.js",
+                "./simulation_utils.js": "./simulation_utils.js"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    <div class="container">
+        <div class="header">
+            <h1>Calculadora de Movimiento Vertical</h1>
+            <p class="subtitle">Herramienta avanzada para análisis de cinemática vertical</p>
+        </div>
+
+        <div class="input-section card">
+            <div class="section-header">
+                <h2>Configuración del Movimiento</h2>
+            </div>
+            
+            <div class="motion-type">
+                <label class="radio-card">
+                    <input type="radio" name="motionType" value="verticalLaunch" checked>
+                    <div class="radio-content">
+                        <div class="radio-icon">🚀</div>
+                        <span>Lanzamiento Vertical</span>
+                    </div>
+                </label>
+                <label class="radio-card">
+                    <input type="radio" name="motionType" value="freeFall">
+                    <div class="radio-content">
+                        <div class="radio-icon">⬇️</div>
+                        <span>Caída Libre</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="direction-options">
+                <label class="radio-card small">
+                    <input type="radio" name="direction" value="upwards" checked>
+                    <div class="radio-content">
+                        <span>Hacia Arriba</span>
+                    </div>
+                </label>
+                <label class="radio-card small">
+                    <input type="radio" name="direction" value="downwards">
+                    <div class="radio-content">
+                        <span>Hacia Abajo</span>
+                    </div>
+                </label>
+            </div>
+
+            <div class="inputs">
+                <div class="input-group">
+                    <label for="vi">Velocidad Inicial (vi)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="vi" placeholder="Ej: 10">
+                        <span class="unit">m/s</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="vf">Velocidad Final (vf)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="vf" placeholder="Ej: 0">
+                        <span class="unit">m/s</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="h">Desplazamiento (h)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="h" placeholder="Ej: 5">
+                        <span class="unit">m</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="t">Tiempo (t)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="t" placeholder="Ej: 1">
+                        <span class="unit">s</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="g">Gravedad (g)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="g" value="9.8" placeholder="Ej: 9.8">
+                        <span class="unit">m/s²</span>
+                    </div>
+                </div>
+                <div class="input-group" id="initialYSimGroup">
+                    <label for="initialYSim">Altura Inicial para Simulación</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="initialYSim" value="0" placeholder="Ej: 0">
+                        <span class="unit">m</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="additional-calculations-section">
+                <div class="section-header">
+                    <h3>Consultas Específicas</h3>
+                    <p class="section-description">Analiza el movimiento en puntos específicos</p>
+                </div>
+                <div class="inputs">
+                    <div class="input-group">
+                        <label for="queryTime">Calcular en el tiempo (t)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="queryTime" placeholder="Ej: 1.5">
+                            <span class="unit">s</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="queryHeight">Calcular en la altura (h)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="queryHeight" placeholder="Ej: 2">
+                            <span class="unit">m</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="calculateOnlyBtn" class="primary-btn">
+                <span class="btn-icon">✨</span>
+                Calcular Resultados
+            </button>
+            <p id="error-message" class="error-message"></p>
+        </div>
+
+        <div class="results-section card">
+            <div class="section-header">
+                <h2>Resultados del Análisis</h2>
+            </div>
+            <div class="results-grid">
+                <div class="result-item">
+                    <div class="result-label">Velocidad Inicial (vi)</div>
+                    <div class="result-value"><span id="res_vi"></span> <span class="unit">m/s</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Velocidad Final (vf)</div>
+                    <div class="result-value"><span id="res_vf"></span> <span class="unit">m/s</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Desplazamiento (h)</div>
+                    <div class="result-value"><span id="res_h"></span> <span class="unit">m</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Tiempo (t)</div>
+                    <div class="result-value"><span id="res_t"></span> <span class="unit">s</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Gravedad (g)</div>
+                    <div class="result-value"><span id="res_g"></span> <span class="unit">m/s²</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Aceleración Calculada (a)</div>
+                    <div class="result-value"><span id="res_a"></span> <span class="unit">m/s²</span></div>
+                </div>
+                <div class="result-item highlight">
+                    <div class="result-label">Altura Máxima (h_max)</div>
+                    <div class="result-value"><span id="res_h_max"></span> <span class="unit">m</span></div>
+                </div>
+                <div class="result-item highlight">
+                    <div class="result-label">Tiempo para Altura Máxima (t_max)</div>
+                    <div class="result-value"><span id="res_t_max"></span> <span class="unit">s</span></div>
+                </div>
+                <div class="result-item highlight">
+                    <div class="result-label">Tiempo de Vuelo</div>
+                    <div class="result-value"><span id="res_t_flight"></span> <span class="unit">s</span></div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Distancia Total Recorrida</div>
+                    <div class="result-value"><span id="res_total_dist"></span> <span class="unit">m</span></div>
+                </div>
+            </div>
+            
+            <div class="query-results-section">
+                <h4>Resultados de Consultas Específicas</h4>
+                <div class="query-results-grid">
+                    <div class="result-item query">
+                        <div class="result-label">Velocidad en t_q</div>
+                        <div class="result-value"><span id="res_v_at_tq"></span> <span class="unit">m/s</span></div>
+                    </div>
+                    <div class="result-item query">
+                        <div class="result-label">Altura en t_q</div>
+                        <div class="result-value"><span id="res_h_at_tq"></span> <span class="unit">m</span></div>
+                    </div>
+                    <div class="result-item query">
+                        <div class="result-label">Tiempo(s) en h_q</div>
+                        <div class="result-value"><span id="res_t_at_hq"></span></div>
+                    </div>
+                    <div class="result-item query">
+                        <div class="result-label">Velocidad(es) en h_q</div>
+                        <div class="result-value"><span id="res_v_at_hq"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="simulation-section card">
+            <div class="section-header">
+                <h2>Simulación Visual</h2>
+                <p class="section-description">Visualización en tiempo real del movimiento</p>
+            </div>
+            <div class="simulation-container">
+                <canvas id="physicsCanvas" width="320" height="800"></canvas>
+                <div class="simulation-controls">
+                    <button id="simulateBtn" class="control-btn primary-btn">
+                        <span class="btn-icon">▶️</span>
+                        Simular
+                    </button>
+                    <button id="pauseResumeBtn" class="control-btn">
+                        <span class="btn-icon">⏸️</span>
+                        Pausar
+                    </button>
+                    <button id="restartBtn" class="control-btn">
+                        <span class="btn-icon">🔄</span>
+                        Reiniciar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
